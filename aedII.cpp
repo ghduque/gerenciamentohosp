@@ -1,10 +1,11 @@
 #include <iostream>
 #include <string>
-#include <unordered_map> TESTEEEEEEEEEEEE
+#include <unordered_map>
 #include <algorithm>
+#include <cstdlib> // Para system("CLS")
 using namespace std;
 
-struct Paciente { // Estrutura para armazenar informaçôes de um paciente
+struct Paciente {
     int id;
     int prioridade;
     string nome;
@@ -12,33 +13,25 @@ struct Paciente { // Estrutura para armazenar informaçôes de um paciente
     string historicoMedico;
 };
 
-struct NoAVL { // Nó da árvore AVL para armazenar pacientes 
+struct NoAVL {
     Paciente paciente;
     int altura;
     NoAVL* esq;
     NoAVL* dir;
 };
 
-unordered_map<int, string> mapIdParaNome; // Mapeamento de ID para nome do paciente 
-unordered_map<string, int> mapNomeParaId; // Mapeamento de nome para ID do paciente 
+unordered_map<int, string> mapIdParaNome;
+unordered_map<string, int> mapNomeParaId;
 
-int altura(NoAVL* no) { // Retorna a altura do nó
-    if (no) {
-        return no->altura;
-    } else {
-        return 0;
-    }
+int altura(NoAVL* no) {
+    return no ? no->altura : 0;
 }
 
-int fatorBalanceamento(NoAVL* no) { // Calcula o fator de balanceamento de um nó 
-    if (no) {
-        return altura(no->esq) - altura(no->dir);
-    } else {
-        return 0;
-    }
+int fatorBalanceamento(NoAVL* no) {
+    return no ? altura(no->esq) - altura(no->dir) : 0;
 }
 
-NoAVL* rotacaoDireita(NoAVL* y) { // Realiza a rotação a direita
+NoAVL* rotacaoDireita(NoAVL* y) {
     NoAVL* x = y->esq;
     y->esq = x->dir;
     x->dir = y;
@@ -47,7 +40,7 @@ NoAVL* rotacaoDireita(NoAVL* y) { // Realiza a rotação a direita
     return x;
 }
 
-NoAVL* rotacaoEsquerda(NoAVL* x) { // Realiza a rotação a esquerda 
+NoAVL* rotacaoEsquerda(NoAVL* x) {
     NoAVL* y = x->dir;
     x->dir = y->esq;
     y->esq = x;
@@ -56,7 +49,7 @@ NoAVL* rotacaoEsquerda(NoAVL* x) { // Realiza a rotação a esquerda
     return y;
 }
 
-NoAVL* balancear(NoAVL* no) { // Balanceia a árvore após uma operação de inserção ou remoção 
+NoAVL* balancear(NoAVL* no) {
     int balance = fatorBalanceamento(no);
     if (balance > 1) {
         if (fatorBalanceamento(no->esq) < 0)
@@ -71,7 +64,7 @@ NoAVL* balancear(NoAVL* no) { // Balanceia a árvore após uma operação de ins
     return no;
 }
 
-NoAVL* inserir(NoAVL* raiz, Paciente paciente) { //Insere um novo paciente na árvore AVL
+NoAVL* inserir(NoAVL* raiz, Paciente paciente) {
     if (!raiz) {
         NoAVL* novo = new NoAVL{paciente, 1, nullptr, nullptr};
         mapIdParaNome[paciente.id] = paciente.nome;
@@ -88,144 +81,66 @@ NoAVL* inserir(NoAVL* raiz, Paciente paciente) { //Insere um novo paciente na á
     return balancear(raiz);
 }
 
-NoAVL* buscarPorID(NoAVL* raiz, int id) { // Busca um paciente na árvore por ID
-    if (!raiz) {
-        return nullptr;
-    }
-    if (raiz->paciente.id == id) {
-        return raiz;
-    } else {
-        NoAVL* encontrado = buscarPorID(raiz->esq, id);
-        if (encontrado) {
-            return encontrado;
-        } else {
-            return buscarPorID(raiz->dir, id);
-        }
-    }
+NoAVL* buscarPorID(NoAVL* raiz, int id) {
+    if (!raiz) return nullptr;
+    if (raiz->paciente.id == id) return raiz;
+    if (id < raiz->paciente.id) return buscarPorID(raiz->esq, id);
+    return buscarPorID(raiz->dir, id);
 }
 
-NoAVL* buscarPorNome(NoAVL* raiz, const string& nome) { // Busca um paciente na árvore por nome
-    if (!raiz){
-        return nullptr;
-    }
-    if (raiz->paciente.nome == nome){
-        return raiz;
-    } else{
-        NoAVL* encontrado = buscarPorNome(raiz->esq, nome);
-        if (encontrado) {
-            return encontrado;
-        } else {
-            return buscarPorNome(raiz->dir, nome);
-        }
-    }
+NoAVL* buscarPorNome(NoAVL* raiz, const string& nome) {
+    if (!raiz) return nullptr;
+    if (raiz->paciente.nome == nome) return raiz;
+    NoAVL* encontrado = buscarPorNome(raiz->esq, nome);
+    if (encontrado) return encontrado;
+    return buscarPorNome(raiz->dir, nome);
 }
 
-NoAVL* buscarMinimo(NoAVL* raiz) { // Encontra o nó com menor ID na árvore
-    while (raiz->esq) raiz = raiz->esq;
-    return raiz;
-}
+NoAVL* remover(NoAVL* raiz, int id) {
+    if (!raiz) return raiz;
 
-NoAVL* remover(NoAVL* raiz, int id) { // Remove um paciente por ID
-    if (!raiz){
-        return raiz;
-    }
-
-    if (id < raiz->paciente.id)
-        raiz->esq = remover(raiz->esq, id);
-    else if (id > raiz->paciente.id)
-        raiz->dir = remover(raiz->dir, id);
+    if (id < raiz->paciente.id) raiz->esq = remover(raiz->esq, id);
+    else if (id > raiz->paciente.id) raiz->dir = remover(raiz->dir, id);
     else {
         if (!raiz->esq || !raiz->dir) {
-            NoAVL* temp;
-            if (raiz->esq) {
-                temp = raiz->esq;
-            } else {
-                temp = raiz->dir;
-            }
-            if (!temp) {
-                temp = raiz;
-                raiz = nullptr;
-            } else {
-                *raiz = *temp;
-            }
+            NoAVL* temp = raiz->esq ? raiz->esq : raiz->dir;
+            if (!temp) { temp = raiz; raiz = nullptr; }
+            else *raiz = *temp;
             delete temp;
         } else {
-            NoAVL* temp = buscarMinimo(raiz->dir);
+            NoAVL* temp = buscarPorNome(raiz->dir, raiz->paciente.nome);
             raiz->paciente = temp->paciente;
             raiz->dir = remover(raiz->dir, temp->paciente.id);
         }
     }
 
-    if (raiz){ 
+    if (raiz) {
         raiz->altura = max(altura(raiz->esq), altura(raiz->dir)) + 1;
         return balancear(raiz);
-    } else {
-        return raiz;
     }
-}
-
-NoAVL* removerPaciente(NoAVL* raiz, const string& chave) { // Remove um paciente por ID ou nome
-    int id;
-    if (isdigit(chave[0])) {
-        id = stoi(chave);
-    } else {
-        if (mapNomeParaId.find(chave) == mapNomeParaId.end()) {
-            cout << "Paciente nao encontrado.\n";
-            return raiz;
-        }
-        id = mapNomeParaId[chave];
-    }
-
-    NoAVL* temp = buscarPorID(raiz, id);
-    if (temp) {
-        mapNomeParaId.erase(temp->paciente.nome);
-        mapIdParaNome.erase(id);
-        raiz = remover(raiz, id);
-    }
-
-    cout << "Paciente removido com sucesso.\n";
     return raiz;
 }
 
-void alterarPrioridade(NoAVL*& raiz, const string& chave, int novaPrioridade) { // Altera a prioridade de um paciente 
-    int id;
-    if (isdigit(chave[0])) {
-        id = stoi(chave);
-    } else {
-        if (mapNomeParaId.find(chave) == mapNomeParaId.end()) {
-            cout << "Paciente nao encontrado.\n";
-            return;
-        }
-        id = mapNomeParaId[chave];
-    }
-
-    NoAVL* paciente = buscarPorID(raiz, id);
-    if (paciente) {
-        Paciente dados = paciente->paciente;
-        raiz = remover(raiz, id);
-        dados.prioridade = novaPrioridade;
-        raiz = inserir(raiz, dados);
-        cout << "Ordem de prioridade foi alterada com sucesso.\n";
-    } else {
-        cout << "Nao existe paciente para alterar prioridade.\n";
-    }
-}
-
-void listarPacientes(NoAVL* raiz) { // Lista todos os pacientes em ordem crescente por prioridade
-    if (raiz){
+void listarPacientes(NoAVL* raiz) {
+    if (raiz) {
         listarPacientes(raiz->esq);
         cout << "ID: " << raiz->paciente.id << endl;
         cout << "Nome: " << raiz->paciente.nome << endl;
         cout << "Prioridade: " << raiz->paciente.prioridade << endl;
+        cout << "Telefone: " << raiz->paciente.telefone << endl;
+        cout << "Historico Medico: " << raiz->paciente.historicoMedico << "\n" << endl;
         listarPacientes(raiz->dir);
-    } else {
-        return;
     }
 }
 
-void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
+void clear() {
+    system("cls");
+}
+
+void menu(NoAVL*& raiz) {
     int opcao;
     do {
+        clear();  
         cout << "\nMenu - Sistema de Gerenciamento de Hospital\n";
         cout << "1. Inserir paciente\n";
         cout << "2. Listar pacientes\n";
@@ -239,22 +154,10 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
         switch(opcao) {
             case 1: {
                 Paciente p;
-                do {
-                    cout << "ID: ";
-                    cin >> p.id;
-                    if (p.id <= 0) {
-                        cout << "ID inválido. Deve ser um número positivo.\n";
-                    }
-                } while (p.id <= 0);
-
-                do {
-                    cout << "Prioridade (1 a 5): ";
-                    cin >> p.prioridade;
-                    if (p.prioridade < 1 || p.prioridade > 5) {
-                        cout << "Prioridade inválida. Deve ser entre 1 e 5.\n";
-                    }
-                } while (p.prioridade < 1 || p.prioridade > 5);
-
+                cout << "ID: ";
+                cin >> p.id;
+                cout << "Prioridade (1 a 5): ";
+                cin >> p.prioridade;
                 cin.ignore();
                 cout << "Nome: ";
                 getline(cin, p.nome);
@@ -264,6 +167,7 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                 getline(cin, p.historicoMedico);
                 raiz = inserir(raiz, p);
                 cout << "\nPaciente inserido com sucesso.\n";
+                cin.ignore();
                 break;
             }
             case 2: {
@@ -273,6 +177,9 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                     cout << "\nListagem de Pacientes:\n";
                     listarPacientes(raiz);
                 }
+                cout << "Pressione Enter para continuar...";
+                cin.ignore();
+                cin.get();  // Aguarda o usuario pressionar Enter
                 break;
             }
             case 3: {
@@ -297,9 +204,14 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                     cout << "ID: " << paciente->paciente.id << endl;
                     cout << "Nome: " << paciente->paciente.nome << endl;
                     cout << "Prioridade: " << paciente->paciente.prioridade << endl;
+                    cout << "Telefone: " << paciente->paciente.telefone << endl;
+                    cout << "Historico Medico: " << paciente->paciente.historicoMedico << "\n" << endl;
                 } else {
                     cout << "Paciente nao encontrado.\n";
                 }
+                cout << "Pressione Enter para continuar...";
+                cin.ignore();
+                cin.get();  // Aguarda o usuario pressionar Enter
                 break;
             }
             case 4: {
@@ -315,10 +227,34 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                     cout << "Digite a nova prioridade (1 a 5): ";
                     cin >> novaPrioridade;
                     if (novaPrioridade < 1 || novaPrioridade > 5) {
-                        cout << "Prioridade inválida. Deve ser entre 1 e 5.\n";
+                        cout << "Prioridade invalida. Deve ser entre 1 e 5.\n";
                     }
                 } while (novaPrioridade < 1 || novaPrioridade > 5);
-                alterarPrioridade(raiz, chave, novaPrioridade);
+                
+                int id;
+                if (isdigit(chave[0])) {
+                    id = stoi(chave);
+                } else {
+                    if (mapNomeParaId.find(chave) == mapNomeParaId.end()) {
+                        cout << "Paciente nao encontrado.\n";
+                        break;
+                    }
+                    id = mapNomeParaId[chave];
+                }
+
+                NoAVL* paciente = buscarPorID(raiz, id);
+                if (paciente) {
+                    Paciente dados = paciente->paciente;
+                    raiz = remover(raiz, id);
+                    dados.prioridade = novaPrioridade;
+                    raiz = inserir(raiz, dados);
+                    cout << "Ordem de prioridade foi alterada com sucesso.\n";
+                } else {
+                    cout << "Nao existe paciente para alterar prioridade.\n";
+                }
+                cout << "Pressione Enter para continuar...";
+                cin.ignore();
+                cin.get();  // Aguarda o usuario pressionar Enter
                 break;
             }
             case 5: {
@@ -326,23 +262,45 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                     cout << "Nenhum paciente foi cadastrado.\n";
                     break;
                 }
-                cout << "Digite o ID ou Nome do paciente a remover: ";
+                cout << "Digite o ID ou Nome do paciente para remover: ";
                 string chave;
                 cin >> chave;
-                raiz = removerPaciente(raiz, chave);
+                int id;
+                if (isdigit(chave[0])) {
+                    id = stoi(chave);
+                } else {
+                    if (mapNomeParaId.find(chave) == mapNomeParaId.end()) {
+                        cout << "Paciente nao encontrado.\n";
+                        break;
+                    }
+                    id = mapNomeParaId[chave];
+                }
+
+                NoAVL* paciente = buscarPorID(raiz, id);
+                if (paciente) {
+                    raiz = remover(raiz, id);
+                    cout << "Paciente removido com sucesso.\n";
+                } else {
+                    cout << "Paciente nao encontrado para remocao.\n";
+                }
+                cout << "Pressione Enter para continuar...";
+                cin.ignore();
+                cin.get();  // Aguarda o usuario pressionar Enter
                 break;
             }
             case 0:
                 cout << "Saindo...\n";
                 break;
             default:
-                cout << "Opcao invalida. Tente novamente.\n";
-                break;
+                cout << "Opcao invalida!\n";
+                cout << "Pressione Enter para continuar...";
+                cin.ignore();
+                cin.get();  // Aguarda o usuario pressionar Enter
         }
     } while (opcao != 0);
 }
 
-int main() { // Função principal que inicia o programa 
+int main() {
     NoAVL* raiz = nullptr;
     menu(raiz);
     return 0;
