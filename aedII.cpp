@@ -5,7 +5,7 @@
 #include <cstdlib> // Para system("CLS")
 using namespace std;
 
-struct Paciente {
+struct Paciente { // Estrutura para armazenar informaçôes de um paciente
     int id;
     int prioridade;
     string nome;
@@ -13,25 +13,25 @@ struct Paciente {
     string historicoMedico;
 };
 
-struct NoAVL {
+struct NoAVL { // Nó da árvore AVL para armazenar pacientes 
     Paciente paciente;
     int altura;
     NoAVL* esq;
     NoAVL* dir;
 };
 
-unordered_map<int, string> mapIdParaNome;
-unordered_map<string, int> mapNomeParaId;
+unordered_map<int, string> mapIdParaNome; // Mapeamento de ID para nome do paciente 
+unordered_map<string, int> mapNomeParaId; // Mapeamento de nome para ID do paciente 
 
-int altura(NoAVL* no) {
+int altura(NoAVL* no) { // Função para retornar a altura do nó
     return no ? no->altura : 0;
 }
 
-int fatorBalanceamento(NoAVL* no) {
+int fatorBalanceamento(NoAVL* no) { // Calcula o fator de balanceamento de um nó 
     return no ? altura(no->esq) - altura(no->dir) : 0;
 }
 
-NoAVL* rotacaoDireita(NoAVL* y) {
+NoAVL* rotacaoDireita(NoAVL* y) { // Realiza a rotação a direita
     NoAVL* x = y->esq;
     y->esq = x->dir;
     x->dir = y;
@@ -40,7 +40,7 @@ NoAVL* rotacaoDireita(NoAVL* y) {
     return x;
 }
 
-NoAVL* rotacaoEsquerda(NoAVL* x) {
+NoAVL* rotacaoEsquerda(NoAVL* x) { // Realiza a rotação a esquerda 
     NoAVL* y = x->dir;
     x->dir = y->esq;
     y->esq = x;
@@ -49,7 +49,7 @@ NoAVL* rotacaoEsquerda(NoAVL* x) {
     return y;
 }
 
-NoAVL* balancear(NoAVL* no) {
+NoAVL* balancear(NoAVL* no) { // Balanceia a árvore após uma operação de inserção ou remoção 
     int balance = fatorBalanceamento(no);
     if (balance > 1) {
         if (fatorBalanceamento(no->esq) < 0)
@@ -64,7 +64,7 @@ NoAVL* balancear(NoAVL* no) {
     return no;
 }
 
-NoAVL* inserir(NoAVL* raiz, Paciente paciente) {
+NoAVL* inserir(NoAVL* raiz, Paciente paciente) { //Insere um novo paciente na árvore AVL
     if (!raiz) {
         NoAVL* novo = new NoAVL{paciente, 1, nullptr, nullptr};
         mapIdParaNome[paciente.id] = paciente.nome;
@@ -81,14 +81,14 @@ NoAVL* inserir(NoAVL* raiz, Paciente paciente) {
     return balancear(raiz);
 }
 
-NoAVL* buscarPorID(NoAVL* raiz, int id) {
+NoAVL* buscarPorID(NoAVL* raiz, int id) { // Busca um paciente na árvore por ID
     if (!raiz) return nullptr;
     if (raiz->paciente.id == id) return raiz;
     if (id < raiz->paciente.id) return buscarPorID(raiz->esq, id);
     return buscarPorID(raiz->dir, id);
 }
 
-NoAVL* buscarPorNome(NoAVL* raiz, const string& nome) {
+NoAVL* buscarPorNome(NoAVL* raiz, const string& nome) {  // Busca um paciente na árvore por nome
     if (!raiz) return nullptr;
     if (raiz->paciente.nome == nome) return raiz;
     NoAVL* encontrado = buscarPorNome(raiz->esq, nome);
@@ -121,7 +121,7 @@ NoAVL* remover(NoAVL* raiz, int id) {
     return raiz;
 }
 
-void listarPacientes(NoAVL* raiz) {
+void listarPacientes(NoAVL* raiz) { // Lista todos os pacientes em ordem crescente por prioridade
     if (raiz) {
         listarPacientes(raiz->esq);
         cout << "ID: " << raiz->paciente.id << endl;
@@ -137,7 +137,7 @@ void clear() {
     system("cls");
 }
 
-void menu(NoAVL*& raiz) {
+void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
     int opcao;
     do {
         clear();  
@@ -300,7 +300,7 @@ void menu(NoAVL*& raiz) {
     } while (opcao != 0);
 }
 
-int main() {
+int main() { // Função principal que inicia o programa 
     NoAVL* raiz = nullptr;
     menu(raiz);
     return 0;
