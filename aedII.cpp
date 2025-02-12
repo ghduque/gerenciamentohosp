@@ -4,7 +4,7 @@
 #include <algorithm>
 using namespace std;
 
-struct Paciente {
+struct Paciente { // Estrutura para armazenar informaçôes de um paciente
     int id;
     int prioridade;
     string nome;
@@ -12,17 +12,17 @@ struct Paciente {
     string historicoMedico;
 };
 
-struct NoAVL {
+struct NoAVL { // Nó da árvore AVL para armazenar pacientes 
     Paciente paciente;
     int altura;
     NoAVL* esq;
     NoAVL* dir;
 };
 
-unordered_map<int, string> mapIdParaNome;
-unordered_map<string, int> mapNomeParaId;
+unordered_map<int, string> mapIdParaNome; // Mapeamento de ID para nome do paciente 
+unordered_map<string, int> mapNomeParaId; // Mapeamento de nome para ID do paciente 
 
-int altura(NoAVL* no) {
+int altura(NoAVL* no) { // Retorna a altura do nó
     if (no) {
         return no->altura;
     } else {
@@ -30,7 +30,7 @@ int altura(NoAVL* no) {
     }
 }
 
-int fatorBalanceamento(NoAVL* no) {
+int fatorBalanceamento(NoAVL* no) { // Calcula o fator de balanceamento de um nó 
     if (no) {
         return altura(no->esq) - altura(no->dir);
     } else {
@@ -38,7 +38,7 @@ int fatorBalanceamento(NoAVL* no) {
     }
 }
 
-NoAVL* rotacaoDireita(NoAVL* y) {
+NoAVL* rotacaoDireita(NoAVL* y) { // Realiza a rotação a direita
     NoAVL* x = y->esq;
     y->esq = x->dir;
     x->dir = y;
@@ -47,7 +47,7 @@ NoAVL* rotacaoDireita(NoAVL* y) {
     return x;
 }
 
-NoAVL* rotacaoEsquerda(NoAVL* x) {
+NoAVL* rotacaoEsquerda(NoAVL* x) { // Realiza a rotação a esquerda 
     NoAVL* y = x->dir;
     x->dir = y->esq;
     y->esq = x;
@@ -56,7 +56,7 @@ NoAVL* rotacaoEsquerda(NoAVL* x) {
     return y;
 }
 
-NoAVL* balancear(NoAVL* no) {
+NoAVL* balancear(NoAVL* no) { // Balanceia a árvore após uma operação de inserção ou remoção 
     int balance = fatorBalanceamento(no);
     if (balance > 1) {
         if (fatorBalanceamento(no->esq) < 0)
@@ -71,7 +71,7 @@ NoAVL* balancear(NoAVL* no) {
     return no;
 }
 
-NoAVL* inserir(NoAVL* raiz, Paciente paciente) {
+NoAVL* inserir(NoAVL* raiz, Paciente paciente) { //Insere um novo paciente na árvore AVL
     if (!raiz) {
         NoAVL* novo = new NoAVL{paciente, 1, nullptr, nullptr};
         mapIdParaNome[paciente.id] = paciente.nome;
@@ -88,7 +88,7 @@ NoAVL* inserir(NoAVL* raiz, Paciente paciente) {
     return balancear(raiz);
 }
 
-NoAVL* buscarPorID(NoAVL* raiz, int id) {
+NoAVL* buscarPorID(NoAVL* raiz, int id) { // Busca um paciente na árvore por ID
     if (!raiz) {
         return nullptr;
     }
@@ -104,7 +104,7 @@ NoAVL* buscarPorID(NoAVL* raiz, int id) {
     }
 }
 
-NoAVL* buscarPorNome(NoAVL* raiz, const string& nome) {
+NoAVL* buscarPorNome(NoAVL* raiz, const string& nome) { // Busca um paciente na árvore por nome
     if (!raiz){
         return nullptr;
     }
@@ -120,12 +120,12 @@ NoAVL* buscarPorNome(NoAVL* raiz, const string& nome) {
     }
 }
 
-NoAVL* buscarMinimo(NoAVL* raiz) {
+NoAVL* buscarMinimo(NoAVL* raiz) { // Encontra o nó com menor ID na árvore
     while (raiz->esq) raiz = raiz->esq;
     return raiz;
 }
 
-NoAVL* remover(NoAVL* raiz, int id) {
+NoAVL* remover(NoAVL* raiz, int id) { // Remove um paciente por ID
     if (!raiz){
         return raiz;
     }
@@ -164,7 +164,7 @@ NoAVL* remover(NoAVL* raiz, int id) {
     }
 }
 
-NoAVL* removerPaciente(NoAVL* raiz, const string& chave) {
+NoAVL* removerPaciente(NoAVL* raiz, const string& chave) { // Remove um paciente por ID ou nome
     int id;
     if (isdigit(chave[0])) {
         id = stoi(chave);
@@ -187,7 +187,7 @@ NoAVL* removerPaciente(NoAVL* raiz, const string& chave) {
     return raiz;
 }
 
-void alterarPrioridade(NoAVL*& raiz, const string& chave, int novaPrioridade) {
+void alterarPrioridade(NoAVL*& raiz, const string& chave, int novaPrioridade) { // Altera a prioridade de um paciente 
     int id;
     if (isdigit(chave[0])) {
         id = stoi(chave);
@@ -211,7 +211,7 @@ void alterarPrioridade(NoAVL*& raiz, const string& chave, int novaPrioridade) {
     }
 }
 
-void listarPacientes(NoAVL* raiz) {
+void listarPacientes(NoAVL* raiz) { // Lista todos os pacientes em ordem crescente por prioridade
     if (raiz){
         listarPacientes(raiz->esq);
         cout << "ID: " << raiz->paciente.id << endl;
@@ -223,7 +223,7 @@ void listarPacientes(NoAVL* raiz) {
     }
 }
 
-void menu(NoAVL*& raiz) {
+void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
     int opcao;
     do {
         cout << "\nMenu - Sistema de Gerenciamento de Hospital\n";
@@ -342,7 +342,7 @@ void menu(NoAVL*& raiz) {
     } while (opcao != 0);
 }
 
-int main() {
+int main() { // Função principal que inicia o programa 
     NoAVL* raiz = nullptr;
     menu(raiz);
     return 0;
