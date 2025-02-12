@@ -18,14 +18,11 @@ Antes de executar o projeto, verifique se possui os seguintes requisitos:
 •	Git (opcional, para clonar o repositório)
 
 Como Executar o Projeto
-1. Clone o repositório
-git clone https://github.com/seuusuario/gerenciamento-pacientes.git
-cd gerenciamento-pacientes
 
-3. Compile o arquivo principal
+1. Compile o arquivo principal
 g++ main.cpp -o pacientes
 
-5. Execute o arquivo compilado
+2. Execute o arquivo compilado
 No Windows:
 pacientes.exe
 No Linux/macOS:
