@@ -7,27 +7,27 @@ using namespace std;
 
 struct Paciente { // Estrutura para armazenar informaçôes de um paciente
     int id;
-    int prioridade;
+    int nivelUrgencia;
     string nome;
     string telefone;
     string historicoMedico;
 };
 
-struct NoAVL { // Nó da árvore AVL para armazenar pacientes 
+struct NoAVL { // Nó da árvore AVL para armazenar pacientes
     Paciente paciente;
     int altura;
     NoAVL* esq;
     NoAVL* dir;
 };
 
-unordered_map<int, string> mapIdParaNome; // Mapeamento de ID para nome do paciente 
-unordered_map<string, int> mapNomeParaId; // Mapeamento de nome para ID do paciente 
+unordered_map<int, string> mapIdParaNome; // Mapeamento de ID para nome do paciente
+unordered_map<string, int> mapNomeParaId; // Mapeamento de nome para ID do paciente
 
 int altura(NoAVL* no) { // Função para retornar a altura do nó
     return no ? no->altura : 0;
 }
 
-int fatorBalanceamento(NoAVL* no) { // Calcula o fator de balanceamento de um nó 
+int fatorBalanceamento(NoAVL* no) { // Calcula o fator de balanceamento de um nó
     return no ? altura(no->esq) - altura(no->dir) : 0;
 }
 
@@ -40,7 +40,7 @@ NoAVL* rotacaoDireita(NoAVL* y) { // Realiza a rotação a direita
     return x;
 }
 
-NoAVL* rotacaoEsquerda(NoAVL* x) { // Realiza a rotação a esquerda 
+NoAVL* rotacaoEsquerda(NoAVL* x) { // Realiza a rotação a esquerda
     NoAVL* y = x->dir;
     x->dir = y->esq;
     y->esq = x;
@@ -49,7 +49,7 @@ NoAVL* rotacaoEsquerda(NoAVL* x) { // Realiza a rotação a esquerda
     return y;
 }
 
-NoAVL* balancear(NoAVL* no) { // Balanceia a árvore após uma operação de inserção ou remoção 
+NoAVL* balancear(NoAVL* no) { // Balanceia a árvore após uma operação de inserção ou remoção
     int balance = fatorBalanceamento(no);
     if (balance > 1) {
         if (fatorBalanceamento(no->esq) < 0)
@@ -71,8 +71,8 @@ NoAVL* inserir(NoAVL* raiz, Paciente paciente) { //Insere um novo paciente na á
         mapNomeParaId[paciente.nome] = paciente.id;
         return novo;
     }
-    if (paciente.prioridade < raiz->paciente.prioridade ||
-        (paciente.prioridade == raiz->paciente.prioridade && paciente.id < raiz->paciente.id))
+    if (paciente.nivelUrgencia< raiz->paciente.nivelUrgencia ||
+        (paciente.nivelUrgencia == raiz->paciente.nivelUrgencia && paciente.id < raiz->paciente.id))
         raiz->esq = inserir(raiz->esq, paciente);
     else
         raiz->dir = inserir(raiz->dir, paciente);
@@ -121,12 +121,12 @@ NoAVL* remover(NoAVL* raiz, int id) {
     return raiz;
 }
 
-void listarPacientes(NoAVL* raiz) { // Lista todos os pacientes em ordem crescente por prioridade
+void listarPacientes(NoAVL* raiz) { // Lista todos os pacientes em ordem crescente por nivel de urgencia
     if (raiz) {
         listarPacientes(raiz->esq);
         cout << "ID: " << raiz->paciente.id << endl;
         cout << "Nome: " << raiz->paciente.nome << endl;
-        cout << "Prioridade: " << raiz->paciente.prioridade << endl;
+        cout << "Nivel de urgencia: " << raiz->paciente.nivelUrgencia << endl;
         cout << "Telefone: " << raiz->paciente.telefone << endl;
         cout << "Historico Medico: " << raiz->paciente.historicoMedico << "\n" << endl;
         listarPacientes(raiz->dir);
@@ -140,12 +140,12 @@ void clear() {
 void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
     int opcao;
     do {
-        clear();  
+        clear();
         cout << "\nMenu - Sistema de Gerenciamento de Hospital\n";
         cout << "1. Inserir paciente\n";
         cout << "2. Listar pacientes\n";
         cout << "3. Buscar paciente por ID ou Nome\n";
-        cout << "4. Alterar prioridade de paciente\n";
+        cout << "4. Alterar Nivel de urgencia do paciente\n";
         cout << "5. Remover paciente\n";
         cout << "0. Sair\n";
         cout << "Escolha uma opcao: ";
@@ -156,8 +156,8 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                 Paciente p;
                 cout << "ID: ";
                 cin >> p.id;
-                cout << "Prioridade (1 a 5): ";
-                cin >> p.prioridade;
+                cout << "Nivel de urgencia (1 a 5): ";
+                cin >> p.nivelUrgencia;
                 cin.ignore();
                 cout << "Nome: ";
                 getline(cin, p.nome);
@@ -203,7 +203,7 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                     cout << "Paciente encontrado:\n";
                     cout << "ID: " << paciente->paciente.id << endl;
                     cout << "Nome: " << paciente->paciente.nome << endl;
-                    cout << "Prioridade: " << paciente->paciente.prioridade << endl;
+                    cout << "Nivel de urgencia: " << paciente->paciente.nivelUrgencia << endl;
                     cout << "Telefone: " << paciente->paciente.telefone << endl;
                     cout << "Historico Medico: " << paciente->paciente.historicoMedico << "\n" << endl;
                 } else {
@@ -222,15 +222,15 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                 cout << "Digite o ID ou Nome do paciente: ";
                 string chave;
                 cin >> chave;
-                int novaPrioridade;
+                int novoniveldeurgencia;
                 do {
-                    cout << "Digite a nova prioridade (1 a 5): ";
-                    cin >> novaPrioridade;
-                    if (novaPrioridade < 1 || novaPrioridade > 5) {
-                        cout << "Prioridade invalida. Deve ser entre 1 e 5.\n";
+                    cout << "Digite o novo nivel de urgencia (1 a 5): ";
+                    cin >> novoniveldeurgencia;
+                    if (novoniveldeurgencia < 1 || novoniveldeurgencia > 5) {
+                        cout << "Nivel de urgencia invalido. Deve ser entre 1 e 5.\n";
                     }
-                } while (novaPrioridade < 1 || novaPrioridade > 5);
-                
+                } while (novoniveldeurgencia < 1 || novoniveldeurgencia > 5);
+
                 int id;
                 if (isdigit(chave[0])) {
                     id = stoi(chave);
@@ -246,11 +246,11 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                 if (paciente) {
                     Paciente dados = paciente->paciente;
                     raiz = remover(raiz, id);
-                    dados.prioridade = novaPrioridade;
+                    dados.nivelUrgencia = novoniveldeurgencia;
                     raiz = inserir(raiz, dados);
-                    cout << "Ordem de prioridade foi alterada com sucesso.\n";
+                    cout << "Ordem de ugencia foi alterada com sucesso.\n";
                 } else {
-                    cout << "Nao existe paciente para alterar prioridade.\n";
+                    cout << "Nao existe paciente para alterar nivel de urgencia.\n";
                 }
                 cout << "Pressione Enter para continuar...";
                 cin.ignore();
@@ -300,7 +300,7 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
     } while (opcao != 0);
 }
 
-int main() { // Função principal que inicia o programa 
+int main() { // Função principal que inicia o programa
     NoAVL* raiz = nullptr;
     menu(raiz);
     return 0;
