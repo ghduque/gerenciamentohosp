@@ -5,7 +5,7 @@
 #include <cstdlib> // Para system("CLS")
 using namespace std;
 
-struct Paciente { // Estrutura para armazenar informaçôes de um paciente
+struct Paciente { // Estrutura para armazenar informações de um paciente
     int id;
     int nivelUrgencia;
     string nome;
@@ -71,7 +71,7 @@ NoAVL* inserir(NoAVL* raiz, Paciente paciente) { //Insere um novo paciente na á
         mapNomeParaId[paciente.nome] = paciente.id;
         return novo;
     }
-    if (paciente.nivelUrgencia< raiz->paciente.nivelUrgencia ||
+    if (paciente.nivelUrgencia < raiz->paciente.nivelUrgencia ||
         (paciente.nivelUrgencia == raiz->paciente.nivelUrgencia && paciente.id < raiz->paciente.id))
         raiz->esq = inserir(raiz->esq, paciente);
     else
@@ -121,7 +121,7 @@ NoAVL* remover(NoAVL* raiz, int id) {
     return raiz;
 }
 
-void listarPacientes(NoAVL* raiz) { // Lista todos os pacientes em ordem crescente por nivel de urgencia
+void listarPacientes(NoAVL* raiz) { // Lista todos os pacientes em ordem crescente por nível de urgência
     if (raiz) {
         listarPacientes(raiz->esq);
         cout << "ID: " << raiz->paciente.id << endl;
@@ -134,13 +134,16 @@ void listarPacientes(NoAVL* raiz) { // Lista todos os pacientes em ordem crescen
 }
 
 void clear() {
+#ifdef _WIN32
     system("cls");
+#else
+    system("clear");
+#endif
 }
 
-void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
+void menu(NoAVL*& raiz) { // Função exibe o menu e interage com o usuário
     int opcao;
     do {
-        clear();
         cout << "\nMenu - Sistema de Gerenciamento de Hospital\n";
         cout << "1. Inserir paciente\n";
         cout << "2. Listar pacientes\n";
@@ -177,9 +180,6 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                     cout << "\nListagem de Pacientes:\n";
                     listarPacientes(raiz);
                 }
-                cout << "Pressione Enter para continuar...";
-                cin.ignore();
-                cin.get();  // Aguarda o usuario pressionar Enter
                 break;
             }
             case 3: {
@@ -209,9 +209,6 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                 } else {
                     cout << "Paciente nao encontrado.\n";
                 }
-                cout << "Pressione Enter para continuar...";
-                cin.ignore();
-                cin.get();  // Aguarda o usuario pressionar Enter
                 break;
             }
             case 4: {
@@ -248,13 +245,10 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                     raiz = remover(raiz, id);
                     dados.nivelUrgencia = novoniveldeurgencia;
                     raiz = inserir(raiz, dados);
-                    cout << "Ordem de ugencia foi alterada com sucesso.\n";
+                    cout << "Ordem de urgencia foi alterada com sucesso.\n";
                 } else {
                     cout << "Nao existe paciente para alterar nivel de urgencia.\n";
                 }
-                cout << "Pressione Enter para continuar...";
-                cin.ignore();
-                cin.get();  // Aguarda o usuario pressionar Enter
                 break;
             }
             case 5: {
@@ -283,9 +277,6 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                 } else {
                     cout << "Paciente nao encontrado para remocao.\n";
                 }
-                cout << "Pressione Enter para continuar...";
-                cin.ignore();
-                cin.get();  // Aguarda o usuario pressionar Enter
                 break;
             }
             case 0:
@@ -293,10 +284,13 @@ void menu(NoAVL*& raiz) { // Função exibe o menu e interagir com usuário
                 break;
             default:
                 cout << "Opcao invalida!\n";
-                cout << "Pressione Enter para continuar...";
-                cin.ignore();
-                cin.get();  // Aguarda o usuario pressionar Enter
         }
+
+        // Limpeza da tela após pressionar Enter
+        cout << "Pressione Enter para continuar...";
+        cin.ignore();
+        cin.get();  // Aguarda o usuário pressionar Enter
+        clear();    // Limpa a tela após interação
     } while (opcao != 0);
 }
 
