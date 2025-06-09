@@ -1,5 +1,6 @@
 # Sistema de Gerenciamento de Hospitais / Hospital Management System 
 
+---
 # Descrição / Description
 
 Sistema que permite o cadastro, busca e remoção de pacientes em um hospital, utilizando uma árvore AVL para organizar os pacientes por prioridade. O sistema também permite alteração de prioridade e listagem de pacientes.
